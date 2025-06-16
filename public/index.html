@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Role Assignment</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            /* Lighter, modern background */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 2.5em 3em;
+            /* Increased padding */
+            border-radius: 12px;
+            /* Softer radius */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            /* Softer, more diffused shadow */
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+            /* Max width for better readability on larger screens */
+            box-sizing: border-box;
+            margin: 1em;
+        }
+
+        h1 {
+            color: #2c3e50;
+            /* Darker, more professional heading color */
+            margin-bottom: 0.5em;
+            font-weight: 600;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 2em;
+            font-size: 0.95em;
+        }
+
+        label {
+            display: block;
+            /* Labels on their own line */
+            text-align: left;
+            margin-bottom: 0.5em;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        input[type="email"],
+        input[type="text"] {
+            width: 100%;
+            /* Full width */
+            padding: 12px 15px;
+            /* More padding */
+            margin-bottom: 1.5em;
+            /* More space below inputs */
+            border: 1px solid #d1d5db;
+            /* Lighter border */
+            border-radius: 6px;
+            /* Softer radius */
+            box-sizing: border-box;
+            /* Include padding and border in the element's total width and height */
+            font-size: 1em;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        input[type="email"]:focus,
+        input[type="text"]:focus {
+            border-color: #5865F2;
+            box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.2);
+            /* Focus ring */
+            outline: none;
+        }
+
+        button {
+            background-color: #5865F2;
+            color: white;
+            padding: 12px 25px;
+            /* More padding */
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+            width: 100%;
+            /* Full width button */
+        }
+
+        button:hover {
+            background-color: #4752C4;
+        }
+
+        .message {
+            margin-top: 1.5em;
+            padding: 1em 1.5em;
+            border-radius: 6px;
+            font-size: 0.9em;
+            text-align: left;
+        }
+
+        .success {
+            background-color: #e6f7f0;
+            /* Lighter success green */
+            color: #00642e;
+            border: 1px solid #b3e0c8;
+        }
+
+        .error {
+            background-color: #fdecea;
+            /* Lighter error red */
+            color: #8a1c1c;
+            border: 1px solid #f8c1be;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                margin: 1em;
+                padding: 2em;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Discord Role Verification</h1>
+        <p>Enter the email you used for your Eventbrite order and your full Discord username (e.g., username#1234).</p>
+        <form id="roleForm">
+            <div>
+                <label for="emailOrOrderId">Eventbrite Email or Order ID:</label>
+                <input type="text" id="emailOrOrderId" name="emailOrOrderId" placeholder="you@example.com or 123456789"
+                    required>
+            </div>
+            <div>
+                <label for="discordTag">Discord Username:</label>
+                <input type="text" id="discordTag" name="discordTag" placeholder="username#1234"
+                    title="Please enter in the format username#1234" required>
+            </div>
+            <button type="submit">Verify & Get Role</button>
+        </form>
+        <div id="responseMessage" class="message" style="display:none;"></div>
+    </div>
+
+    <script>
+        document.getElementById('roleForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const emailOrOrderId = document.getElementById('emailOrOrderId').value;
+            const discordTag = document.getElementById('discordTag').value;
+            const responseMessageDiv = document.getElementById('responseMessage');
+
+            responseMessageDiv.style.display = 'none';
+            responseMessageDiv.className = 'message'; // Reset classes
+
+            try {
+                const response = await fetch('/api/assign-role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ emailOrOrderId, discordTag })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    responseMessageDiv.textContent = 'Thanks for your submission! If your information matches our records, your Discord role will be updated shortly.';
+                    responseMessageDiv.classList.add('success');
+                } else {
+                    responseMessageDiv.textContent = result.error || 'An error occurred. Please try again.';
+                    responseMessageDiv.classList.add('error');
+                }
+            } catch (err) {
+                responseMessageDiv.textContent = 'A network error occurred. Please try again.';
+                responseMessageDiv.classList.add('error');
+            }
+            responseMessageDiv.style.display = 'block';
+            document.getElementById('roleForm').reset();
+        });
+    </script>
+</body>
+
+</html>

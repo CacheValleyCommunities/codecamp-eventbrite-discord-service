@@ -3,4 +3,6 @@ services:
   app:
     build: .
     ports:
-      - "3000:"
+      - "3000:${PORT:-3000}"
+    volumes:
+      - .:/usr/src/app/data
