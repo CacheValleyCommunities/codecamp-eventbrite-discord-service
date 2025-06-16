@@ -18,12 +18,7 @@ try {
     db.prepare('SELECT discord_user_id FROM attendees LIMIT 1').get();
 } catch (e) {
     if (e.message.includes('no such column') || e.message.includes('has no column named discord_user_id')) {
-        console.log('Adding column: discord_user_id');
         db.prepare('ALTER TABLE attendees ADD COLUMN discord_user_id TEXT').run();
-    } else {
-        // Don't throw an error here if it's something else, just log it.
-        // The table might be empty, causing a different kind of benign error on SELECT.
-        console.warn('Pre-check for discord_user_id column failed, but not necessarily an error:', e.message);
     }
 }
 
@@ -32,10 +27,7 @@ try {
     db.prepare('SELECT role_redeemed FROM attendees LIMIT 1').get();
 } catch (e) {
     if (e.message.includes('no such column') || e.message.includes('has no column named role_redeemed')) {
-        console.log('Adding column: role_redeemed');
         db.prepare('ALTER TABLE attendees ADD COLUMN role_redeemed INTEGER DEFAULT 0').run();
-    } else {
-        console.warn('Pre-check for role_redeemed column failed, but not necessarily an error:', e.message);
     }
 }
 

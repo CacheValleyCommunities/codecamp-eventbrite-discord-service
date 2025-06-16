@@ -14,7 +14,6 @@ app.use(express.static(path.join(__dirname, 'public'))); // Add this line
 
 // Explicitly serve index.html for the root path
 app.get('/', (req, res) => {
-    console.log(`GET request for root path: ${req.method} ${req.originalUrl}`);
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -153,7 +152,6 @@ async function sendWelcomeEmail(recipientEmail, orderDetails) {
 
     try {
         const body = await mg.messages().send(data);
-        console.log(`✅ Email sent to ${recipientEmail}:`, body);
     } catch (error) {
         console.error(`Error sending email to ${recipientEmail}:`, error);
     }
@@ -173,8 +171,6 @@ app.post('/eventbrite-webhook', (req, res) => {
     try {
         const webhook = req.body;
 
-        console.log('Received webhook:', webhook);
-
         if (
             webhook.config?.action === 'order.placed' &&
             webhook.config?.endpoint_url
@@ -191,14 +187,12 @@ app.post('/eventbrite-webhook', (req, res) => {
                     return response.json();
                 })
                 .then(orderDetails => {
-                    console.log('Order details:', orderDetails);
                     const email = orderDetails.email;
                     // Assuming orderId is part of orderDetails or can be derived. Eventbrite API usually provides id for the order.
                     const orderId = orderDetails.id;
 
                     if (email && orderId) {
                         saveAttendee(email, orderId.toString());
-                        console.log(`✅ Saved attendee: ${email}`);
                         // Send welcome email
                         sendWelcomeEmail(email, orderDetails);
                     } else {
@@ -269,10 +263,8 @@ app.post('/api/assign-role', async (req, res) => {
 });
 
 app.use((req, res, next) => {
-    console.log(`404 - Path not found: ${req.method} ${req.originalUrl}`);
     res.status(404).send("Sorry, can't find that!");
 });
 
 app.listen(process.env.PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on port ${process.env.PORT} and listening on 0.0.0.0`);
 });

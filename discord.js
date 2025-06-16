@@ -4,7 +4,6 @@ const client = new Client({
 });
 
 client.once('ready', () => {
-    console.log(`✅ Discord bot ready as ${client.user.tag}`);
 });
 
 client.login(process.env.DISCORD_BOT_TOKEN);
@@ -22,8 +21,6 @@ async function assignRole(usernameInput) {
     }
 
     await guild.roles.fetch();
-    const roles = guild.roles.cache.map(role => `${role.name} (ID: ${role.id})`).join('\n');
-    console.log(`🔍 Available roles in the guild:\n${roles}`);
     const role = guild.roles.cache.get(process.env.DISCORD_ROLE_ID);
     if (!role) {
         throw new Error(`❌ Role with ID ${process.env.DISCORD_ROLE_ID} not found`);
@@ -34,7 +31,6 @@ async function assignRole(usernameInput) {
     }
 
     await member.roles.add(role);
-    console.log(`✅ Role assigned to ${member.user.username} (${member.id})`);
 }
 
 
